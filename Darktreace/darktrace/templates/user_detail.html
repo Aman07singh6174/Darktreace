@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}{{ user.display_name }}{% endblock %}
+{% block crumb %}Identity detail{% endblock %}
+{% block content %}
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">MONITORED IDENTITY / DETAIL</div>
+        <h1>{{ user.display_name }}</h1>
+        <p>{{ user.username }} · {{ user.department }} · fictional telemetry record</p>
+    </div><span
+        class="risk-number {{ 'risk-high' if user.risk_score >= 80 else 'risk-mid' if user.risk_score >= 60 else '' }}">{{
+        user.risk_score }} / 100</span>
+</section>
+<section class="metric-grid detail-metrics">
+    <article class="metric-card">
+        <div class="metric-top"><span>RISK LEVEL</span></div><strong>{{ user.risk_level }}</strong>
+    </article>
+    <article class="metric-card">
+        <div class="metric-top"><span>ACCOUNT STATE</span></div><strong>{{ user.status }}</strong>
+    </article>
+    <article class="metric-card">
+        <div class="metric-top"><span>BLOCK REMAINING</span></div><strong data-remaining-seconds="{{ remaining }}"
+            id="detail-countdown">{{ remaining }}s</strong>
+    </article>
+    <article class="metric-card">
+        <div class="metric-top"><span>LAST OBSERVED</span></div><strong class="detail-date">{{
+            user.last_seen|pretty_time }}</strong>
+    </article>
+</section>
+<section class="panel detail-controls">
+    <div class="panel-heading">
+        <div>
+            <div class="eyebrow">ADMIN CONTROL</div>
+            <h2>Identity actions</h2>
+        </div><span class="panel-tag">AUDIT LOGGED</span>
+    </div>
+    <div class="detail-action-row"><a class="button button-secondary" href="{{ url_for('main.security_logs') }}">View
+            activity logs</a>
+        <form method="post" action="{{ url_for('main.user_action', user_id=user.id) }}"><input type="hidden"
+                name="csrf_token" value="{{ csrf_token() }}"><button class="button button-secondary" name="action"
+                value="force_logout">Force logout</button></form>{% if user.blocked_until %}<form method="post"
+            action="{{ url_for('main.user_action', user_id=user.id) }}"><input type="hidden" name="csrf_token"
+                value="{{ csrf_token() }}"><button class="button button-primary" name="action"
+                value="unblock">Unblock</button></form>{% else %}<form method="post"
+            action="{{ url_for('main.user_action', user_id=user.id) }}"><input type="hidden" name="csrf_token"
+                value="{{ csrf_token() }}"><button class="button button-secondary" name="action"
+                value="temporary_block">Temporarily block</button></form>{% endif %}{% if user.is_suspended %}<form
+            method="post" action="{{ url_for('main.user_action', user_id=user.id) }}"><input type="hidden"
+                name="csrf_token" value="{{ csrf_token() }}"><button class="button button-primary" name="action"
+                value="activate">Activate</button></form>{% else %}<form method="post"
+            action="{{ url_for('main.user_action', user_id=user.id) }}"><input type="hidden" name="csrf_token"
+                value="{{ csrf_token() }}"><button class="button button-danger" name="action"
+                value="suspend">Suspend</button></form>{% endif %}
+    </div>
+</section>
+<section class="dashboard-data-grid">
+    <article class="panel">
+        <div class="panel-heading">
+            <div>
+                <div class="eyebrow">USER ACTIVITY</div>
+                <h2>Recent security events</h2>
+            </div>
+        </div>
+        <div class="compact-list">{% for item in logs %}<div class="compact-row"><span
+                    class="severity-dot severity-{{ item.risk_level|lower }}"></span>
+                <div class="compact-copy"><strong>{{ item.event_type|replace('_',' ')|title }} · {{ item.risk_points }}
+                        points</strong><span>{{ item.details }}</span></div><time>{{ item.created_at|pretty_time
+                    }}</time>
+            </div>{% else %}<p class="empty-state">No events recorded.</p>{% endfor %}</div>
+    </article>
+    <article class="panel">
+        <div class="panel-heading">
+            <div>
+                <div class="eyebrow">RELATED INTELLIGENCE</div>
+                <h2>Linked reports</h2>
+            </div>
+        </div>
+        <div class="compact-list">{% for report in reports %}<div class="compact-row"><span
+                    class="severity-dot severity-{{ report.risk_level|lower }}"></span>
+                <div class="compact-copy"><strong>{{ report.threat_id }} · {{ report.threat_type }}</strong><span>{{
+                        report.description }}</span></div><time>{{ report.detected_at|pretty_time }}</time>
+            </div>{% else %}<p class="empty-state">No related reports.</p>{% endfor %}</div>
+    </article>
+</section>
+{% endblock %}

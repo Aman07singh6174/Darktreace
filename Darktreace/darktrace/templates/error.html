@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ code }}{% endblock %}
+{% block content %}<section class="error-page"><span class="eyebrow">REQUEST / {{ code }}</span>
+    <h1>{{ code }}</h1>
+    <p>{{ message }}</p><a class="button button-primary"
+        href="{{ url_for('main.dashboard') if g.admin else url_for('main.login') }}">{{ 'Back to overview' if g.admin
+        else
+        'Return to sign in' }} →</a>
+</section>{% endblock %}

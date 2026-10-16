@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Suspicious activity{% endblock %}
+{% block crumb %}Suspicious activity{% endblock %}
+{% block content %}
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">RULE-BASED DETECTION / REVIEW</div>
+        <h1>Suspicious activity</h1>
+        <p>Identities meeting the configured demo risk threshold of {{ threshold }}.</p>
+    </div><span class="sim-tag">NO REAL INCIDENT DATA</span>
+</section>
+<section class="panel table-panel">
+    <div class="panel-heading">
+        <div>
+            <div class="eyebrow">IDENTITY REVIEW</div>
+            <h2>Threshold-crossing users</h2>
+        </div><span class="panel-tag">{{ users|length }} FLAGGED</span>
+    </div>
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>USER</th>
+                    <th>STATUS</th>
+                    <th>SCORE</th>
+                    <th>RISK</th>
+                    <th>LAST SEEN</th>
+                    <th>BLOCK EXPIRY</th>
+                    <th>REVIEW</th>
+                </tr>
+            </thead>
+            <tbody>{% for user in users %}<tr>
+                    <td><strong>{{ user.display_name }}</strong><small class="cell-subline">{{ user.username }} · {{
+                            user.department }}</small></td>
+                    <td>{{ user.status }}</td>
+                    <td><span class="risk-number {{ 'risk-high' if user.risk_score >= 80 else 'risk-mid' }}">{{
+                            user.risk_score }}/100</span></td>
+                    <td>{{ user.risk_level }}</td>
+                    <td class="mono-cell">{{ user.last_seen|pretty_time }}</td>
+                    <td>{% if user.blocked_until %}<span class="block-countdown"
+                            data-expiry="{{ user.blocked_until.isoformat() }}"></span>{% else %}Not blocked{% endif %}
+                    </td>
+                    <td><a class="small-button" href="{{ url_for('main.user_detail', user_id=user.id) }}">Review</a>
+                    </td>
+                </tr>{% else %}<tr>
+                    <td colspan="7" class="empty-state">No suspicious identities currently meet the configured
+                        threshold.</td>
+                </tr>{% endfor %}</tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

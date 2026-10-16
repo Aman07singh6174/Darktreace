@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#111715">
+    <title>{% block title %}DarkTrace{% endblock %} | DarkTrace</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    {% block head %}{% endblock %}
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+    <canvas id="network-background" aria-hidden="true"></canvas>
+    {% if g.admin %}
+    <aside class="sidebar">
+        <a class="brand" href="{{ url_for('main.dashboard') }}"><span
+                class="brand-mark">DT</span><span>DarkTrace<small>THREAT INTELLIGENCE</small></span></a>
+        <div class="nav-label">WORKSPACE</div>
+        <nav class="main-nav" aria-label="Admin navigation">
+            <a class="nav-link {% if request.endpoint == 'main.dashboard' %}active{% endif %}"
+                href="{{ url_for('main.dashboard') }}"><span class="nav-icon">◫</span>Overview</a>
+            <a class="nav-link {% if request.endpoint == 'main.suspicious' %}active{% endif %}"
+                href="{{ url_for('main.suspicious') }}"><span class="nav-icon">⚠</span>Suspicious activity</a>
+            <a class="nav-link {% if request.endpoint == 'main.reports' %}active{% endif %}"
+                href="{{ url_for('main.reports') }}"><span class="nav-icon">▤</span>Threat reports</a>
+            <a class="nav-link {% if request.endpoint == 'main.communities' %}active{% endif %}"
+                href="{{ url_for('main.communities') }}"><span class="nav-icon">⌘</span>Communities</a>
+            <div class="nav-label nav-label-spaced">ADMINISTRATION</div>
+            <a class="nav-link {% if request.endpoint == 'main.alerts' %}active{% endif %}"
+                href="{{ url_for('main.alerts') }}"><span class="nav-icon">⚑</span>Alert queue</a>
+            <a class="nav-link {% if request.endpoint == 'main.users' %}active{% endif %}"
+                href="{{ url_for('main.users') }}"><span class="nav-icon">♙</span>User management</a>
+            <a class="nav-link {% if request.endpoint == 'main.graph' %}active{% endif %}"
+                href="{{ url_for('main.graph') }}"><span class="nav-icon">⌘</span>Relationship graph</a>
+            <a class="nav-link {% if request.endpoint == 'main.security_logs' %}active{% endif %}"
+                href="{{ url_for('main.security_logs') }}"><span class="nav-icon">≡</span>Security logs</a>
+        </nav>
+        <div class="sidebar-foot">
+            <div class="system-state"><span class="pulse-dot"></span><span>SIMULATION ACTIVE</span></div>
+            <div class="user-chip">
+                <div class="avatar">A</div>
+                <div class="user-chip-copy"><strong>{{ g.admin.username }}</strong><span>ADMINISTRATOR</span>
+                </div>
+                <form action="{{ url_for('main.logout') }}" method="post"><input type="hidden" name="csrf_token"
+                        value="{{ csrf_token() }}"><button class="icon-button" title="Sign out"
+                        aria-label="Sign out">↗</button></form>
+            </div>
+        </div>
+    </aside>
+    {% endif %}
+    <main class="main-shell {% if not g.admin %}public-shell{% endif %}">
+        {% if g.admin %}<header class="topbar">
+            <div><span class="crumb">DARKTRACE /</span> <span class="crumb-current">{% block crumb %}Overview{% endblock
+                    %}</span></div>
+            <div class="topbar-right"><span class="live-status"><i></i> LOCAL SIMULATION</span><span class="top-date"
+                    id="local-clock"></span></div>
+        </header>{% endif %}
+        <div class="page-content {% if not g.admin %}public-content{% endif %}">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}<div class="flash-stack">{% for category, message in messages %}<div
+                    class="flash flash-{{ category }}" role="status">{{ message }}<button type="button"
+                        class="flash-close" aria-label="Dismiss">×</button></div>{% endfor %}</div>{% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+            <footer class="page-footer"><span>DarkTrace · Local Demo Environment</span><span>Fictional data only · no
+                    external feeds
+                    connected</span></footer>
+        </div>
+    </main>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

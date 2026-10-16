@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Monitored identities{% endblock %}
+{% block crumb %}Monitored identities{% endblock %}
+{% block content %}
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">IDENTITY MONITORING / DIRECTORY</div>
+        <h1>Monitored identities</h1>
+        <p>Fictional users are telemetry records only; they cannot sign in.</p>
+    </div><span class="count-badge">{{ users|length }} IDENTITIES</span>
+</section>
+<section class="panel table-panel">
+    <div class="panel-heading">
+        <div>
+            <div class="eyebrow">RISK AND ACCESS STATE</div>
+            <h2>Identity controls</h2>
+        </div><span class="panel-tag">THRESHOLD {{ threshold }}</span>
+    </div>
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>IDENTITY</th>
+                    <th>DEPARTMENT</th>
+                    <th>STATUS</th>
+                    <th>RISK</th>
+                    <th>LAST SEEN</th>
+                    <th>BLOCK EXPIRY</th>
+                    <th>ADMIN ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>{% for user in users %}<tr>
+                    <td><a href="{{ url_for('main.user_detail', user_id=user.id) }}">
+                            <div class="account-cell"><span class="avatar avatar-small">{{ user.display_name[:1]|upper
+                                    }}</span><span><strong>{{ user.display_name }}</strong><small>{{ user.username
+                                        }}</small></span></div>
+                        </a></td>
+                    <td>{{ user.department }}</td>
+                    <td><span
+                            class="state-pill {{ 'state-blocked' if user.blocked_until and user.blocked_until > now else 'state-disabled' if user.is_suspended else 'state-active' }}">{{
+                            'BLOCKED' if user.blocked_until and user.blocked_until > now else 'SUSPENDED' if
+                            user.is_suspended else user.status|upper }}</span></td>
+                    <td><span
+                            class="risk-number {% if user.risk_score >= 80 %}risk-high{% elif user.risk_score >= 60 %}risk-mid{% endif %}">{{
+                            user.risk_score }}<small>/100</small></span><small class="cell-subline">{{ user.risk_level
+                            }}</small></td>
+                    <td class="mono-cell">{{ user.last_seen|pretty_time }}</td>
+                    <td>{% if user.blocked_until and user.blocked_until > now %}<span class="block-countdown"
+                            data-expiry="{{ user.blocked_until.isoformat() }}"></span>{% else %}<span
+                            class="muted">—</span>{% endif %}</td>
+                    <td>
+                        <div class="row-actions"><a class="small-button"
+                                href="{{ url_for('main.user_detail', user_id=user.id) }}">View</a>
+                            <form method="post" action="{{ url_for('main.user_action', user_id=user.id) }}"><input
+                                    type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button
+                                    class="small-button" name="action" value="force_logout">Force logout</button></form>
+                            {% if user.blocked_until and user.blocked_until > now %}<form method="post"
+                                action="{{ url_for('main.user_action', user_id=user.id) }}"><input type="hidden"
+                                    name="csrf_token" value="{{ csrf_token() }}"><button
+                                    class="small-button small-primary" name="action" value="unblock">Unblock</button>
+                            </form>{% else %}<form method="post"
+                                action="{{ url_for('main.user_action', user_id=user.id) }}"><input type="hidden"
+                                    name="csrf_token" value="{{ csrf_token() }}"><button
+                                    class="small-button small-danger" name="action"
+                                    value="temporary_block">Block</button></form>{% endif %}{% if user.is_suspended %}
+                            <form method="post" action="{{ url_for('main.user_action', user_id=user.id) }}"><input
+                                    type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button
+                                    class="small-button" name="action" value="activate">Activate</button></form>{% else
+                            %}<form method="post" action="{{ url_for('main.user_action', user_id=user.id) }}"><input
+                                    type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button
+                                    class="small-button" name="action" value="suspend">Suspend</button></form>{% endif
+                            %}
+                        </div>
+                    </td>
+                </tr>{% endfor %}</tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>{% endblock %}

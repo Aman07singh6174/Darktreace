@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Security alerts{% endblock %}
+{% block crumb %}Security alerts{% endblock %}
+{% block content %}
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">DETECTION / RESPONSE QUEUE</div>
+        <h1>Security alerts</h1>
+        <p>Review rule-based alerts generated from fictional demo activity.</p>
+    </div><span class="count-badge">{{ alerts|length }} ALERTS</span>
+</section>
+<section class="panel table-panel">
+    <div class="panel-heading">
+        <div>
+            <div class="eyebrow">ALERT TRIAGE</div>
+            <h2>All security alerts</h2>
+        </div><span class="panel-tag">LOCAL DATA</span>
+    </div>
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>SEVERITY</th>
+                    <th>ALERT</th>
+                    <th>IDENTITY</th>
+                    <th>DETAIL</th>
+                    <th>TIME</th>
+                    <th>STATE</th>
+                    <th>ACTION</th>
+                </tr>
+            </thead>
+            <tbody>{% for alert in alerts %}<tr>
+                    <td><span class="severity-label severity-text-{{ alert.severity|title|lower }}">{{
+                            alert.severity|title }}</span></td>
+                    <td><strong>{{ alert.title }}</strong></td>
+                    <td>{{ alert.user.display_name if alert.user else 'System' }}</td>
+                    <td class="alert-message-cell">{{ alert.message }}</td>
+                    <td class="mono-cell">{{ alert.created_at|pretty_time }}</td>
+                    <td><span class="state-pill {{ 'state-active' if alert.acknowledged else 'state-blocked' }}">{{
+                            'ACKNOWLEDGED' if alert.acknowledged else 'NEEDS REVIEW' }}</span></td>
+                    <td>{% if not alert.acknowledged %}<form method="post"
+                            action="{{ url_for('main.acknowledge_alert', alert_id=alert.id) }}"><input type="hidden"
+                                name="csrf_token" value="{{ csrf_token() }}"><button class="small-button small-primary"
+                                type="submit">Acknowledge</button></form>{% else %}<span class="muted">Complete</span>{%
+                        endif %}</td>
+                </tr>{% else %}<tr>
+                    <td colspan="7" class="empty-state">No alerts recorded.</td>
+                </tr>{% endfor %}</tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

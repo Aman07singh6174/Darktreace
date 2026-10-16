@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Relationship graph{% endblock %}
+{% block crumb %}Relationship graph{% endblock %}
+{% block content %}
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">ENTITY ANALYSIS / SIMULATED RELATIONSHIPS</div>
+        <h1>Relationship graph</h1>
+        <p>Connections between fictional users, communities, posts, and reports.</p>
+    </div><span class="sim-tag">DEMO GRAPH</span>
+</section>
+<section class="panel graph-panel">
+    <div class="panel-heading">
+        <div>
+            <div class="eyebrow">OBSERVED ENTITY LINKS</div>
+            <h2>Training data relationships</h2>
+        </div>
+        <div class="graph-legend"><span><i class="legend-user"></i>Users</span><span><i
+                    class="legend-community"></i>Communities</span><span><i class="legend-post"></i>Posts</span><span><i
+                    class="legend-report"></i>Reports</span></div>
+    </div>
+    <div class="graph-stage graph-canvas-stage"><canvas id="relationship-graph"
+            aria-label="Graph linking fictional users, communities, posts, and reports"></canvas></div>
+    <div class="graph-foot"><span id="graph-summary">Loading relationships…</span><span>All graph entities and links are
+            synthetic demo data.</span></div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/graph.js') }}"></script>{% endblock %}

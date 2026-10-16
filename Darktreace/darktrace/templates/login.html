@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block body_class %}login-page{% endblock %}
+{% block content %}
+<section class="login-layout">
+    <div class="login-brand-panel">
+        <a class="brand login-brand" href="{{ url_for('main.login') }}"><span
+                class="brand-mark">DT</span><span>DarkTrace<small>THREAT INTELLIGENCE</small></span></a>
+        <div class="login-art" aria-hidden="true">
+            <div class="radar-ring ring-one"></div>
+            <div class="radar-ring ring-two"></div>
+            <div class="radar-ring ring-three"></div>
+            <div class="radar-center"><span>DT</span></div><span class="radar-point point-a"></span><span
+                class="radar-point point-b"></span><span class="radar-point point-c"></span><span
+                class="radar-sweep"></span>
+        </div>
+        <div class="login-caption"><span class="eyebrow">CONTROL ROOM / 01</span>
+            <h1>Signals become<br><em>actionable.</em></h1>
+            <p>A contained environment for exploring simulated security signals, risk, and response.</p>
+        </div>
+        <div class="login-meta"><span>SIMULATION BUILD 1.0</span><span>LOCAL DATA ONLY</span></div>
+    </div>
+    <div class="login-form-panel">
+        <div class="login-form-wrap">
+            <div class="eyebrow">SECURE ACCESS</div>
+            <h2>Welcome back</h2>
+            <p class="muted">Administrator access to the local monitoring environment.</p>
+            <form method="post" class="form-stack">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <label for="username">Username</label><input id="username" name="username" autocomplete="username"
+                    required autofocus placeholder="Enter username">
+                <label for="password">Password</label><input id="password" name="password" type="password"
+                    autocomplete="current-password" required placeholder="Enter password">
+                <button class="button button-primary button-wide" type="submit">Sign in <span>→</span></button>
+            </form>
+            <div class="demo-access">
+                <div class="demo-access-head"><span>LOCAL DEMO ENVIRONMENT</span><span class="mini-dot"></span></div>
+                <p>Fictional monitoring data · Administrator sign-in only</p>
+            </div>
+            <p class="safe-note">This application uses synthetic data only. No external threat services or network
+                controls are connected.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

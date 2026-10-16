@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Security logs{% endblock %}
+{% block crumb %}Security logs{% endblock %}
+{% block content %}
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">EVENT FORENSICS / AUDIT VIEW</div>
+        <h1>Security logs</h1>
+        <p>Fictional activity records and administrator audit actions.</p>
+    </div><span class="count-badge">LATEST {{ logs|length }}</span>
+</section>
+<section class="panel table-panel">
+    <div class="panel-heading">
+        <div>
+            <div class="eyebrow">EVENT HISTORY</div>
+            <h2>Security event stream</h2>
+        </div><span class="panel-tag">DOCUMENTATION IP RANGES ONLY</span>
+    </div>
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>TIME</th>
+                    <th>EVENT</th>
+                    <th>IDENTITY</th>
+                    <th>DETAIL</th>
+                    <th>DEMO SOURCE IP</th>
+                    <th>RISK</th>
+                </tr>
+            </thead>
+            <tbody>{% for item in logs %}<tr>
+                    <td class="mono-cell">{{ item.created_at|pretty_time }}</td>
+                    <td><span class="event-tag">{{ item.event_type|replace('_',' ')|title }}</span></td>
+                    <td>{{ item.user.display_name if item.user else 'System' }}</td>
+                    <td>{{ item.details }}</td>
+                    <td class="mono-cell">{{ item.source_ip }}</td>
+                    <td><span
+                            class="risk-number {{ 'risk-high' if item.risk_points >= 60 else 'risk-mid' if item.risk_points >= 30 else '' }}">{{
+                            item.risk_points }} <small>{{ item.risk_level }}</small></span></td>
+                </tr>{% else %}<tr>
+                    <td colspan="6" class="empty-state">No security logs.</td>
+                </tr>{% endfor %}</tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

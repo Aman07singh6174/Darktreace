@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Threat intelligence{% endblock %}
+{% block crumb %}Threat intelligence{% endblock %}
+{% block content %}
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">SIMULATED INTELLIGENCE / CASE REGISTER</div>
+        <h1>Threat reports</h1>
+        <p>Fictional classroom observations for analysis workflow demonstrations only.</p>
+    </div><span class="sim-tag">NO EXTERNAL FEEDS</span>
+</section>
+<section class="panel report-compose">
+    <div class="panel-heading">
+        <div>
+            <div class="eyebrow">REPORT AUTHORING</div>
+            <h2>Add a fictional report</h2>
+        </div><span class="panel-tag">ADMIN ONLY</span>
+    </div>
+    <form method="post" class="report-form"><input type="hidden" name="csrf_token"
+            value="{{ csrf_token() }}"><label>Threat type<input name="threat_type" required maxlength="100"
+                placeholder="Synthetic identity anomaly"></label><label>Risk level<select name="risk_level">
+                <option>Low</option>
+                <option selected>Medium</option>
+                <option>High</option>
+                <option>Critical</option>
+            </select></label><label>Source type<select name="source_type">
+                <option>Training simulation</option>
+                <option>Simulated telemetry</option>
+                <option>Fictional community</option>
+                <option>Tabletop exercise</option>
+            </select></label><label>Related demo user<select name="related_user_id">
+                <option value="">No linked identity</option>{% for user in users %}<option value="{{ user.id }}">{{
+                    user.display_name }} · {{ user.username }}</option>{% endfor %}
+            </select></label><label class="report-summary">Description<textarea name="description" required
+                maxlength="1200" rows="3"
+                placeholder="Describe the fictional observation and analyst context."></textarea></label>
+        <div class="report-submit"><span class="muted">Only safe fictional content is stored.</span><button
+                class="button button-primary" type="submit">Add report →</button></div>
+    </form>
+</section>
+<section class="panel table-panel">
+    <div class="panel-heading">
+        <div>
+            <div class="eyebrow">INTELLIGENCE REGISTER</div>
+            <h2>All threat reports</h2>
+        </div><span class="panel-tag">{{ reports|length }} RECORDS</span>
+    </div>
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>THREAT ID / TYPE</th>
+                    <th>RISK</th>
+                    <th>STATUS</th>
+                    <th>SOURCE</th>
+                    <th>DETECTED</th>
+                    <th>RELATED USER</th>
+                    <th>ANALYST</th>
+                </tr>
+            </thead>
+            <tbody>{% for report in reports %}<tr>
+                    <td class="report-title-cell"><strong>{{ report.threat_id }} · {{ report.threat_type
+                            }}</strong><small>{{ report.description }}</small></td>
+                    <td><span class="severity-label severity-text-{{ report.risk_level|lower }}">{{ report.risk_level
+                            }}</span></td>
+                    <td>
+                        <form class="status-form" method="post"
+                            action="{{ url_for('main.report_status', report_id=report.id) }}"><input type="hidden"
+                                name="csrf_token" value="{{ csrf_token() }}"><select name="status"
+                                aria-label="Report workflow status" onchange="this.form.submit()">{% for state in
+                                ('Open','Investigating','Contained','Closed') %}<option value="{{ state }}"
+                                    {{ 'selected' if report.status==state }}>{{ state }}</option>{% endfor %}</select>
+                        </form>
+                    </td>
+                    <td>{{ report.source_type }}</td>
+                    <td class="mono-cell">{{ report.detected_at|pretty_time }}</td>
+                    <td>{{ report.related_user.display_name if report.related_user else '—' }}</td>
+                    <td><span class="status-pill status-{{ report.analyst_status|lower|replace(' ', '-') }}">{{
+                            report.analyst_status }}</span></td>
+                </tr>{% else %}<tr>
+                    <td colspan="7" class="empty-state">No fictional reports recorded.</td>
+                </tr>{% endfor %}</tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

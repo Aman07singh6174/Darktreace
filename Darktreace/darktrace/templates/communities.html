@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Simulated communities{% endblock %}
+{% block crumb %}Simulated communities{% endblock %}
+{% block content %}
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">SYNTHETIC SOURCES / MONITORED ACTIVITY</div>
+        <h1>Simulated communities</h1>
+        <p>Fictional posts support defensive monitoring and analyst practice.</p>
+    </div><span class="sim-tag">LOCAL DEMO ENVIRONMENT</span>
+</section>
+<section class="community-grid">{% for community in communities %}<article class="community-tile">
+        <div class="community-tile-top"><span class="community-mark">{{ '%02d'|format(loop.index) }}</span><span
+                class="panel-tag">{{ community.topic|upper }}</span></div>
+        <h2>{{ community.name }}</h2>
+        <p>{{ community.description }}</p>
+    </article>{% endfor %}</section>
+<section class="community-layout">
+    <article class="panel composer-panel">
+        <div class="panel-heading">
+            <div>
+                <div class="eyebrow">CONTROLLED EVENT INPUT</div>
+                <h2>Add a fictional post</h2>
+            </div><span class="panel-tag">ADMIN ONLY</span>
+        </div>
+        <form method="post" class="form-stack"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label
+                for="user_id">Monitored identity</label><select id="user_id" name="user_id" required>{% for user in
+                users %}<option value="{{ user.id }}">{{ user.display_name }} · {{ user.username }}</option>{% endfor
+                %}</select><label for="community_id">Community</label><select id="community_id" name="community_id"
+                required>{% for community in communities %}<option value="{{ community.id }}">{{ community.name }}
+                </option>{% endfor %}</select><label for="content">Fictional note</label><textarea id="content"
+                name="content" rows="5" maxlength="1000" required
+                placeholder="Training exercise: unusual sign-in frequency was reviewed in the fictional tenant."></textarea>
+            <div class="form-bottom"><span class="muted">Indicator rules only score safe training text.</span><button
+                    class="button button-primary" type="submit">Evaluate post →</button></div>
+        </form>
+    </article>
+    <article class="panel stream-panel">
+        <div class="panel-heading">
+            <div>
+                <div class="eyebrow">SYNTHETIC ACTIVITY</div>
+                <h2>Recent posts</h2>
+            </div><span class="live-status"><i></i> FICTIONAL FEED</span>
+        </div>
+        <div class="post-stream">{% for post in posts %}<div class="post-item">
+                <div class="post-meta">
+                    <div class="post-author"><span class="avatar avatar-small">{{ post.user.display_name[:1]|upper
+                            }}</span><strong>{{ post.user.display_name }}</strong><span class="post-room">{{
+                            post.community.name }}</span></div><time>{{ post.created_at|pretty_time }}</time>
+                </div>
+                <p>{{ post.content }}</p><span class="post-risk">{{ post.risk_score }} RISK POINTS · SYNTHETIC</span>
+            </div>{% else %}<p class="empty-state">No community activity.</p>{% endfor %}</div>
+    </article>
+</section>
+{% endblock %}
